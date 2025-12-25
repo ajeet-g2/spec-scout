@@ -12,6 +12,8 @@ require_relative 'spec_scout/profile_normalizer'
 # Agents
 require_relative 'spec_scout/agents/database_agent'
 require_relative 'spec_scout/agents/factory_agent'
+require_relative 'spec_scout/agents/intent_agent'
+require_relative 'spec_scout/agents/risk_agent'
 
 # Main module for Spec Scout, a tool for analyzing and optimizing test suite database and factory usage.
 module SpecScout
