@@ -99,7 +99,7 @@ module SpecScout
         return :no_database_data unless database_operations_present?
 
         total_queries = profile_data.db[:total_queries] || 0
-        inserts = profile_data.db[:inserts] || 0
+        profile_data.db[:inserts] || 0
 
         case total_queries
         when 0..2
@@ -117,7 +117,7 @@ module SpecScout
         factory_count = profile_data.factories.values.sum { |factory| factory[:count] || 0 }
         create_usage = profile_data.factories.values.count { |factory| factory[:strategy] == :create }
 
-        if factory_count <= 1 && create_usage == 0
+        if factory_count <= 1 && create_usage.zero?
           :minimal_factories # Unit test pattern
         elsif factory_count > 5 || create_usage > 3
           :heavy_factories # Integration test pattern
@@ -134,9 +134,9 @@ module SpecScout
           unit_test_result(unit_signals, integration_signals)
         elsif integration_signals >= 3
           integration_test_result(unit_signals, integration_signals)
-        elsif unit_signals >= 2 && integration_signals == 0
+        elsif unit_signals >= 2 && integration_signals.zero?
           unit_test_result_medium_confidence(unit_signals, integration_signals)
-        elsif integration_signals >= 2 && unit_signals == 0
+        elsif integration_signals >= 2 && unit_signals.zero?
           integration_test_result_medium_confidence(unit_signals, integration_signals)
         elsif unit_signals > integration_signals && unit_signals >= 1
           unit_test_result_medium_confidence(unit_signals, integration_signals)

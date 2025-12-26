@@ -8,6 +8,8 @@ require_relative 'spec_scout/base_agent'
 require_relative 'spec_scout/configuration'
 require_relative 'spec_scout/testprof_integration'
 require_relative 'spec_scout/profile_normalizer'
+require_relative 'spec_scout/consensus_engine'
+require_relative 'spec_scout/output_formatter'
 
 # Agents
 require_relative 'spec_scout/agents/database_agent'

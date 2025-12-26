@@ -127,7 +127,7 @@ RSpec.describe SpecScout::Agents::RiskAgent do
           user: {
             strategy: :create,
             count: 1,
-            traits: [:with_callback, :published, :activated]
+            traits: %i[with_callback published activated]
           }
         }
       end
@@ -152,7 +152,7 @@ RSpec.describe SpecScout::Agents::RiskAgent do
           user: {
             strategy: :create,
             count: 1,
-            associations: [:posts, :comments, :profile, :settings]
+            associations: %i[posts comments profile settings]
           }
         }
       end
@@ -212,7 +212,7 @@ RSpec.describe SpecScout::Agents::RiskAgent do
     end
 
     context 'when nested operations are indicated in metadata' do
-      let(:metadata) { { nested_operations: true, chained_callbacks: ['User', 'Profile', 'Notification'] } }
+      let(:metadata) { { nested_operations: true, chained_callbacks: %w[User Profile Notification] } }
 
       it 'detects complex callback chain indicators' do
         agent = described_class.new(profile_data)

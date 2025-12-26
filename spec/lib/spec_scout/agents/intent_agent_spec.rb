@@ -65,7 +65,7 @@ RSpec.describe SpecScout::Agents::IntentAgent do
           example_location: 'spec/features/user_registration_spec.rb:15',
           spec_type: :model,
           runtime_ms: 250,
-          factories: { 
+          factories: {
             user: { strategy: :create, count: 3 },
             post: { strategy: :create, count: 5 }
           },

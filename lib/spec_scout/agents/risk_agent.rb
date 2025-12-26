@@ -166,7 +166,7 @@ module SpecScout
         # Check for nested or chained operations in metadata
         if profile_data.metadata.is_a?(Hash) && (profile_data.metadata[:nested_operations] || profile_data.metadata[:chained_callbacks])
           indicators << { type: :nested_operations, metadata: profile_data.metadata }
-          end
+        end
 
         indicators
       end
@@ -184,33 +184,34 @@ module SpecScout
             factory_data[:traits].each do |trait|
               trait_string = trait.to_s
               COMPLEX_FACTORY_PATTERNS.each do |pattern|
-                if trait_string.match?(pattern)
-                  indicators << {
-                    type: :risky_factory_trait,
-                    factory: factory_name,
-                    trait: trait,
-                    pattern: pattern.source
-                  }
-                end
+                next unless trait_string.match?(pattern)
+
+                indicators << {
+                  type: :risky_factory_trait,
+                  factory: factory_name,
+                  trait: trait,
+                  pattern: pattern.source
+                }
               end
             end
           end
 
           # Check for factories with many associations (potential callback triggers)
           associations_count = factory_data[:associations]&.size || 0
-          if associations_count > 2
-            indicators << {
-              type: :complex_associations,
-              factory: factory_name,
-              associations_count: associations_count
-            }
-          end
+          next unless associations_count > 2
+
+          indicators << {
+            type: :complex_associations,
+            factory: factory_name,
+            associations_count: associations_count
+          }
         end
 
         indicators
       end
 
-      def calculate_risk_score(callback_indicators:, side_effect_indicators:, complex_chain_indicators:, factory_risk_indicators:)
+      def calculate_risk_score(callback_indicators:, side_effect_indicators:, complex_chain_indicators:,
+                               factory_risk_indicators:)
         score = 0
 
         # Weight different types of risk indicators
@@ -222,9 +223,10 @@ module SpecScout
         score
       end
 
-      def determine_risk_level(risk_score:, callback_indicators:, side_effect_indicators:, complex_chain_indicators:, factory_risk_indicators:)
+      def determine_risk_level(risk_score:, callback_indicators:, side_effect_indicators:, complex_chain_indicators:,
+                               factory_risk_indicators:)
         total_indicators = callback_indicators.size + side_effect_indicators.size +
-                          complex_chain_indicators.size + factory_risk_indicators.size
+                           complex_chain_indicators.size + factory_risk_indicators.size
 
         if risk_score >= 8 || callback_indicators.size >= 3
           high_risk_result(risk_score, total_indicators)
