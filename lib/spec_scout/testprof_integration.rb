@@ -7,19 +7,21 @@ module SpecScout
   class TestProfIntegration
     class TestProfError < StandardError; end
 
-    def initialize(config = SpecScout.configuration)
-      @config = config
+    def initialize(config = nil)
+      @config = config || ::SpecScout.configuration
       @enabled = false
     end
 
     # Enable and execute TestProf profiling
-    def execute_profiling
-      return unless @config.use_test_prof
+    def execute_profiling(_spec_location = nil)
+      return nil unless @config.use_test_prof
 
       begin
         enable_testprof_profilers
         @enabled = true
-        true
+
+        # Extract profile data immediately after enabling
+        extract_profile_data
       rescue StandardError => e
         raise TestProfError, "Failed to enable TestProf: #{e.message}"
       end

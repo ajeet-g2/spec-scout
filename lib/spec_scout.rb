@@ -6,6 +6,8 @@ require_relative 'spec_scout/agent_result'
 require_relative 'spec_scout/recommendation'
 require_relative 'spec_scout/base_agent'
 require_relative 'spec_scout/configuration'
+require_relative 'spec_scout/safety_validator'
+require_relative 'spec_scout/enforcement_handler'
 require_relative 'spec_scout/testprof_integration'
 require_relative 'spec_scout/profile_normalizer'
 require_relative 'spec_scout/consensus_engine'
@@ -16,6 +18,10 @@ require_relative 'spec_scout/agents/database_agent'
 require_relative 'spec_scout/agents/factory_agent'
 require_relative 'spec_scout/agents/intent_agent'
 require_relative 'spec_scout/agents/risk_agent'
+
+# Main orchestration class
+require_relative 'spec_scout/spec_scout'
+require_relative 'spec_scout/cli'
 
 # Main module for Spec Scout, a tool for analyzing and optimizing test suite database and factory usage.
 module SpecScout

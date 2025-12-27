@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative '../lib/spec_scout'
+
+# CLI entry point for SpecScout
+SpecScout::CLI.run(ARGV)

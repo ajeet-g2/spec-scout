@@ -1,0 +1,27 @@
+— Spec Scout Recommendation
+
+spec/integration/user_workflow_spec.rb:15
+
+Summary:
+- Factory :user used `create` (2x)
+- Factory :post used `create` (5x)
+- DB inserts: 7, selects: 12
+- Runtime: 420ms
+- Type: integration spec
+
+Agent Signals:
+- Database Agent: DB required (✔ HIGH)
+- Factory Agent: create required (✔ HIGH)
+- Intent Agent: integration test behavior (✔ HIGH)
+- Risk Agent: safe to optimize (✔ HIGH)
+
+Final Recommendation:
+— No optimization recommended
+Confidence: ✔ HIGH
+
+Reasoning:
+- Database persistence is required for this integration test
+- Factory strategy is appropriate for test type
+- Test correctly exhibits integration behavior
+- Current implementation is optimal for test intent
+- No performance improvements available without changing test scope

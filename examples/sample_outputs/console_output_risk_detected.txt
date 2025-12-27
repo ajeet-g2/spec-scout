@@ -1,0 +1,27 @@
+⚠ Spec Scout Recommendation
+
+spec/models/payment_spec.rb:67
+
+Summary:
+- Factory :payment used `create` (1x)
+- Factory :user used `create` (1x)
+- DB inserts: 2, selects: 3
+- Runtime: 320ms
+- Type: model spec
+
+Agent Signals:
+- Database Agent: DB unnecessary (⚠ MEDIUM)
+- Factory Agent: prefer build_stubbed (⚠ MEDIUM)
+- Intent Agent: unit test behavior (✔ HIGH)
+- Risk Agent: high risk detected (⚠ HIGH)
+
+Final Recommendation:
+⚠ Assess risk factors before optimizing
+Confidence: ? LOW
+
+Reasoning:
+- after_commit callbacks detected in Payment model
+- Complex callback chain may depend on database persistence
+- Optimization could break callback-dependent functionality
+- Manual review required before applying factory strategy changes
+- Consider testing callback behavior separately if optimization is desired

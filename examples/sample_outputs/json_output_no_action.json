@@ -1,0 +1,108 @@
+{
+  "spec_location": "spec/integration/user_workflow_spec.rb:15",
+  "action": "no_action",
+  "from_value": "",
+  "to_value": "",
+  "confidence": "high",
+  "explanation": [
+    "Database persistence is required for this integration test",
+    "Factory strategy is appropriate for test type",
+    "Test correctly exhibits integration behavior",
+    "Current implementation is optimal for test intent",
+    "No performance improvements available without changing test scope"
+  ],
+  "agent_results": [
+    {
+      "agent_name": "database",
+      "verdict": "db_required",
+      "confidence": "high",
+      "reasoning": "Integration test requires database persistence for proper behavior",
+      "metadata": {
+        "insert_count": 7,
+        "select_count": 12,
+        "reload_detected": true,
+        "transaction_usage": true
+      }
+    },
+    {
+      "agent_name": "factory",
+      "verdict": "create_required",
+      "confidence": "high",
+      "reasoning": "Factory persistence is necessary for integration test workflow",
+      "metadata": {
+        "factory_strategies": {
+          "user": "create",
+          "post": "create"
+        },
+        "association_access": true,
+        "persistence_required": true
+      }
+    },
+    {
+      "agent_name": "intent",
+      "verdict": "integration_test_behavior",
+      "confidence": "high",
+      "reasoning": "Test correctly exhibits integration behavior with multiple system interactions",
+      "metadata": {
+        "spec_type": "integration",
+        "file_location": "spec/integration/",
+        "integration_boundaries": true,
+        "external_dependencies": true
+      }
+    },
+    {
+      "agent_name": "risk",
+      "verdict": "safe_to_optimize",
+      "confidence": "high",
+      "reasoning": "No optimization risks detected, but no optimizations recommended",
+      "metadata": {
+        "after_commit_callbacks": false,
+        "complex_callbacks": false,
+        "side_effects": false,
+        "external_integrations": true
+      }
+    }
+  ],
+  "profile_data": {
+    "example_location": "spec/integration/user_workflow_spec.rb:15",
+    "spec_type": "integration",
+    "runtime_ms": 420,
+    "factories": {
+      "user": {
+        "strategy": "create",
+        "count": 2
+      },
+      "post": {
+        "strategy": "create",
+        "count": 5
+      }
+    },
+    "db": {
+      "total_queries": 19,
+      "inserts": 7,
+      "selects": 12,
+      "updates": 0,
+      "deletes": 0
+    },
+    "events": {
+      "sql.active_record": {
+        "count": 19,
+        "time": 0.28
+      },
+      "factory_bot.run_factory": {
+        "count": 7,
+        "time": 0.12
+      }
+    },
+    "metadata": {
+      "testprof_version": "1.3.0",
+      "rails_version": "7.0.4"
+    }
+  },
+  "metadata": {
+    "timestamp": "2024-01-15T10:32:15Z",
+    "spec_scout_version": "1.0.0",
+    "analysis_duration_ms": 8,
+    "agents_executed": ["database", "factory", "intent", "risk"]
+  }
+}

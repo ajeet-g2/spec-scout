@@ -36,8 +36,12 @@ RSpec.describe SpecScout::TestProfIntegration do
     context 'when TestProf is enabled in config' do
       before { config.use_test_prof = true }
 
-      it 'returns true when profiling is enabled successfully' do
-        expect(integration.execute_profiling).to be true
+      it 'returns profile data when profiling is enabled successfully' do
+        result = integration.execute_profiling
+        expect(result).to be_a(Hash)
+        expect(result).to have_key(:factory_prof)
+        expect(result).to have_key(:event_prof)
+        expect(result).to have_key(:db_queries)
       end
     end
 

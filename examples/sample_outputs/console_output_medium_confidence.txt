@@ -1,0 +1,27 @@
+⚠ Spec Scout Recommendation
+
+spec/controllers/users_controller_spec.rb:28
+
+Summary:
+- Factory :user used `create` (1x)
+- Factory :organization used `create` (1x)
+- DB inserts: 2, selects: 4
+- Runtime: 180ms
+- Type: controller spec
+
+Agent Signals:
+- Database Agent: DB unclear (? LOW)
+- Factory Agent: prefer build_stubbed (⚠ MEDIUM)
+- Intent Agent: integration test behavior (⚠ MEDIUM)
+- Risk Agent: potential side effects (⚠ MEDIUM)
+
+Final Recommendation:
+⚠ Consider replacing `create(:user)` with `build_stubbed(:user)`
+Confidence: ⚠ MEDIUM
+
+Reasoning:
+- Mixed signals from database usage analysis
+- Controller specs may benefit from stubbed factories
+- Some integration behavior detected - review test boundaries
+- Potential side effects identified - proceed with caution
+- Manual verification recommended before applying changes

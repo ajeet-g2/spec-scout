@@ -1,0 +1,27 @@
+✔ Spec Scout Recommendation
+
+spec/models/user_spec.rb:42
+
+Summary:
+- Factory :user used `create` (3x)
+- Factory :post used `create` (2x)
+- DB inserts: 5, selects: 8
+- Runtime: 245ms
+- Type: model spec
+
+Agent Signals:
+- Database Agent: DB unnecessary (✔ HIGH)
+- Factory Agent: prefer build_stubbed (⚠ MEDIUM)
+- Intent Agent: unit test behavior (✔ HIGH)
+- Risk Agent: safe to optimize (✔ HIGH)
+
+Final Recommendation:
+✔ Replace `create(:user)` with `build_stubbed(:user)`
+Confidence: ✔ HIGH
+
+Reasoning:
+- No database persistence required for this test
+- Factory creates unnecessary database records
+- Test exhibits unit test behavior patterns
+- No risk factors detected (no after_commit callbacks)
+- Potential performance improvement: ~60% faster execution
