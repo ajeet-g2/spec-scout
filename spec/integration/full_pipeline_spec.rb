@@ -55,7 +55,9 @@ RSpec.describe 'Full Pipeline Integration' do
 
       # Verify agents ran and produced results
       agent_results = result[:agent_results]
-      agent_names = agent_results.map(&:agent_name)
+      agent_names = agent_results.map do |result|
+        result.respond_to?(:optimizer_name) ? result.optimizer_name : result.agent_name
+      end
       expect(agent_names).to include(:database, :factory, :intent, :risk)
 
       # Verify each agent result has required fields
@@ -135,11 +137,11 @@ RSpec.describe 'Full Pipeline Integration' do
                                                                                                       })
 
       # Mock one agent to fail
-      allow_any_instance_of(SpecScout::Agents::DatabaseAgent).to receive(:evaluate)
+      allow_any_instance_of(SpecScout::Optimizers::RuleBased::DatabaseOptimiser).to receive(:evaluate)
         .and_raise(StandardError, 'Database agent failed')
 
       # Other agents should still work
-      allow_any_instance_of(SpecScout::Agents::FactoryAgent).to receive(:evaluate).and_return(
+      allow_any_instance_of(SpecScout::Optimizers::RuleBased::FactoryOptimiser).to receive(:evaluate).and_return(
         { verdict: :strategy_optimal, confidence: :medium, reasoning: 'Factory strategy is good' }
       )
 
@@ -150,7 +152,7 @@ RSpec.describe 'Full Pipeline Integration' do
       expect(result[:agent_results]).not_to be_empty
 
       # Should have results from successful agents only
-      successful_agents = result[:agent_results].reject { |r| r.verdict == :agent_failed }
+      successful_agents = result[:agent_results].reject { |r| r.verdict == :optimizer_failed }
       expect(successful_agents).not_to be_empty
     end
 

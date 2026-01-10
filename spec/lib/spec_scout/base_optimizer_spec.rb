@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe SpecScout::BaseAgent do
+RSpec.describe SpecScout::BaseOptimizer do
   let(:valid_profile_data) do
     SpecScout::ProfileData.new(
       example_location: 'spec/models/user_spec.rb:42',
@@ -14,7 +14,7 @@ RSpec.describe SpecScout::BaseAgent do
   end
 
   # Create a concrete implementation for testing
-  let(:test_agent_class) do
+  let(:test_optimizer_class) do
     Class.new(described_class) do
       def evaluate
         create_result(
@@ -28,59 +28,61 @@ RSpec.describe SpecScout::BaseAgent do
 
   describe '#initialize' do
     it 'accepts valid ProfileData' do
-      agent = test_agent_class.new(valid_profile_data)
-      expect(agent.profile_data).to eq(valid_profile_data)
+      optimizer = test_optimizer_class.new(valid_profile_data)
+      expect(optimizer.profile_data).to eq(valid_profile_data)
     end
 
     it 'raises error for invalid ProfileData' do
-      expect { test_agent_class.new('invalid') }.to raise_error(ArgumentError, /Expected ProfileData/)
+      expect { test_optimizer_class.new('invalid') }.to raise_error(ArgumentError, /Expected ProfileData/)
     end
 
     it 'raises error for invalid ProfileData structure' do
       invalid_profile = SpecScout::ProfileData.new
       invalid_profile.example_location = nil
 
-      expect { test_agent_class.new(invalid_profile) }.to raise_error(ArgumentError, /Invalid ProfileData structure/)
+      expect do
+        test_optimizer_class.new(invalid_profile)
+      end.to raise_error(ArgumentError, /Invalid ProfileData structure/)
     end
   end
 
   describe '#evaluate' do
     it 'raises NotImplementedError for base class' do
-      agent = described_class.new(valid_profile_data)
-      expect { agent.evaluate }.to raise_error(NotImplementedError, /Subclasses must implement #evaluate/)
+      optimizer = described_class.new(valid_profile_data)
+      expect { optimizer.evaluate }.to raise_error(NotImplementedError, /Subclasses must implement #evaluate/)
     end
 
-    it 'returns AgentResult for concrete implementation' do
-      agent = test_agent_class.new(valid_profile_data)
-      result = agent.evaluate
+    it 'returns OptimizerResult for concrete implementation' do
+      optimizer = test_optimizer_class.new(valid_profile_data)
+      result = optimizer.evaluate
 
-      expect(result).to be_a(SpecScout::AgentResult)
+      expect(result).to be_a(SpecScout::OptimizerResult)
       expect(result.verdict).to eq(:test_verdict)
       expect(result.confidence).to eq(:high)
       expect(result.reasoning).to eq('Test reasoning')
     end
   end
 
-  describe '#agent_name' do
-    it 'derives agent name from class name' do
-      agent = test_agent_class.new(valid_profile_data)
-      # The test class doesn't have "Agent" in the name, so it returns the full class name
-      expect(agent.agent_name).to be_a(Symbol)
+  describe '#optimizer_name' do
+    it 'derives optimizer name from class name' do
+      optimizer = test_optimizer_class.new(valid_profile_data)
+      # The test class doesn't have "Optimizer" in the name, so it returns the full class name
+      expect(optimizer.optimizer_name).to be_a(Symbol)
     end
   end
 
   describe 'protected helper methods' do
-    let(:agent) { test_agent_class.new(valid_profile_data) }
+    let(:optimizer) { test_optimizer_class.new(valid_profile_data) }
 
     describe '#create_result' do
-      it 'creates valid AgentResult' do
-        result = agent.send(:create_result,
-                            verdict: :test_verdict,
-                            confidence: :medium,
-                            reasoning: 'Test reasoning',
-                            metadata: { test: true })
+      it 'creates valid OptimizerResult' do
+        result = optimizer.send(:create_result,
+                                verdict: :test_verdict,
+                                confidence: :medium,
+                                reasoning: 'Test reasoning',
+                                metadata: { test: true })
 
-        expect(result).to be_a(SpecScout::AgentResult)
+        expect(result).to be_a(SpecScout::OptimizerResult)
         expect(result.verdict).to eq(:test_verdict)
         expect(result.confidence).to eq(:medium)
         expect(result.reasoning).to eq('Test reasoning')
@@ -90,25 +92,25 @@ RSpec.describe SpecScout::BaseAgent do
 
     describe '#database_operations_present?' do
       it 'returns true when database operations are present' do
-        expect(agent.send(:database_operations_present?)).to be true
+        expect(optimizer.send(:database_operations_present?)).to be true
       end
 
       it 'returns false when no database operations' do
         profile_data = SpecScout::ProfileData.new(db: {})
-        agent = test_agent_class.new(profile_data)
-        expect(agent.send(:database_operations_present?)).to be false
+        optimizer = test_optimizer_class.new(profile_data)
+        expect(optimizer.send(:database_operations_present?)).to be false
       end
     end
 
     describe '#factories_present?' do
       it 'returns true when factories are present' do
-        expect(agent.send(:factories_present?)).to be true
+        expect(optimizer.send(:factories_present?)).to be true
       end
 
       it 'returns false when no factories' do
         profile_data = SpecScout::ProfileData.new(factories: {})
-        agent = test_agent_class.new(profile_data)
-        expect(agent.send(:factories_present?)).to be false
+        optimizer = test_optimizer_class.new(profile_data)
+        expect(optimizer.send(:factories_present?)).to be false
       end
     end
   end

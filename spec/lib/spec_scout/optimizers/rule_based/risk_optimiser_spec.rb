@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe SpecScout::Agents::RiskAgent do
+RSpec.describe SpecScout::Optimizers::RuleBased::RiskOptimiser do
   let(:profile_data) do
     SpecScout::ProfileData.new(
       example_location: 'spec/models/user_spec.rb:42',
@@ -24,8 +24,8 @@ RSpec.describe SpecScout::Agents::RiskAgent do
   describe '#evaluate' do
     context 'when no risk factors are present' do
       it 'returns safe to optimize with high confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:safe_to_optimize)
         expect(result.confidence).to eq(:high)
@@ -39,8 +39,8 @@ RSpec.describe SpecScout::Agents::RiskAgent do
       let(:events_data) { { 'after_commit' => { count: 2 }, 'sql.active_record' => { count: 5 } } }
 
       it 'flags potential side effects with medium confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:potential_side_effects)
         expect(result.confidence).to eq(:medium)
@@ -54,8 +54,8 @@ RSpec.describe SpecScout::Agents::RiskAgent do
       let(:metadata) { { callbacks: true, after_commit: ['User#send_welcome_email'] } }
 
       it 'detects callback indicators and flags risk' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:potential_side_effects)
         expect(result.confidence).to eq(:medium)
@@ -71,8 +71,8 @@ RSpec.describe SpecScout::Agents::RiskAgent do
       let(:db_data) { { inserts: 6, updates: 2, deletes: 1, total_queries: 15 } }
 
       it 'flags potential side effects due to high database activity' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:potential_side_effects)
         expect(result.confidence).to eq(:medium)
@@ -93,8 +93,8 @@ RSpec.describe SpecScout::Agents::RiskAgent do
       end
 
       it 'detects potential side effects from complex factory usage' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:potential_side_effects)
         expect(result.confidence).to eq(:medium)
@@ -109,8 +109,8 @@ RSpec.describe SpecScout::Agents::RiskAgent do
       let(:runtime_ms) { 750 }
 
       it 'flags potential side effects due to long execution time' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:potential_side_effects)
         expect(result.confidence).to eq(:medium)
@@ -133,8 +133,8 @@ RSpec.describe SpecScout::Agents::RiskAgent do
       end
 
       it 'detects factory risk patterns' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:potential_side_effects)
         expect(result.confidence).to eq(:medium)
@@ -158,8 +158,8 @@ RSpec.describe SpecScout::Agents::RiskAgent do
       end
 
       it 'flags complex association patterns as risk factors' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:potential_side_effects)
         expect(result.confidence).to eq(:low)
@@ -181,8 +181,8 @@ RSpec.describe SpecScout::Agents::RiskAgent do
       end
 
       it 'detects complex callback chain indicators' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:high_risk)
         expect(result.confidence).to eq(:high)
@@ -200,8 +200,8 @@ RSpec.describe SpecScout::Agents::RiskAgent do
       let(:db_data) { { inserts: 8, updates: 3, total_queries: 15 } }
 
       it 'returns high risk verdict with high confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:high_risk)
         expect(result.confidence).to eq(:high)
@@ -215,8 +215,8 @@ RSpec.describe SpecScout::Agents::RiskAgent do
       let(:metadata) { { nested_operations: true, chained_callbacks: %w[User Profile Notification] } }
 
       it 'detects complex callback chain indicators' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:potential_side_effects)
         expect(result.confidence).to eq(:medium)
@@ -228,10 +228,10 @@ RSpec.describe SpecScout::Agents::RiskAgent do
     end
   end
 
-  describe '#agent_name' do
+  describe '#optimizer_name' do
     it 'returns :risk' do
-      agent = described_class.new(profile_data)
-      expect(agent.agent_name).to eq(:risk)
+      optimizer = described_class.new(profile_data)
+      expect(optimizer.optimizer_name).to eq(:risk)
     end
   end
 end

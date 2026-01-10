@@ -205,4 +205,86 @@ RSpec.describe SpecScout::OutputFormatter do
       expect { Time.iso8601(metadata.fetch('timestamp')) }.not_to raise_error
     end
   end
+
+  describe 'AI agent result formatting' do
+    let(:ai_agent_results) do
+      [
+        SpecScout::AgentResult.new(
+          agent_name: :database,
+          verdict: :db_unnecessary,
+          confidence: :high,
+          reasoning: 'AI analysis shows database operations are unnecessary',
+          metadata: {
+            recommendations: [
+              {
+                'action' => 'replace_factory_strategy',
+                'from' => 'create(:user)',
+                'to' => 'build_stubbed(:user)',
+                'impact' => '60% performance improvement',
+                'reasoning' => 'User object does not need persistence'
+              }
+            ],
+            performance_impact: '60% performance improvement expected',
+            risk_level: 'low',
+            analysis_type: 'database_optimization',
+            ai_agent: true
+          }
+        )
+      ]
+    end
+
+    let(:ai_recommendation) do
+      SpecScout::Recommendation.new(
+        spec_location: 'spec/models/user_spec.rb:42',
+        action: :replace_factory_strategy,
+        from_value: 'create(:user)',
+        to_value: 'build_stubbed(:user)',
+        confidence: :high,
+        explanation: ['AI analysis supports optimization recommendation'],
+        agent_results: ai_agent_results
+      )
+    end
+
+    let(:ai_formatter) { described_class.new(ai_recommendation, profile_data) }
+
+    describe '#format_recommendation' do
+      subject(:output) { ai_formatter.format_recommendation }
+
+      it 'includes AI-specific performance impact' do
+        expect(output).to include('Expected Impact: 60% performance improvement expected')
+      end
+
+      it 'includes AI agent details in agent opinions' do
+        expect(output).to include('Database Agent: DB unnecessary (✔ HIGH)')
+        expect(output).to include('Performance: 60% performance improvement expected')
+        expect(output).to include('Risk Level: Low')
+      end
+
+      it 'includes structured AI recommendations' do
+        expect(output).to include('AI Recommendations:')
+        expect(output).to include('Replace factory strategy: create(:user) → build_stubbed(:user)')
+        expect(output).to include('Reason: User object does not need persistence')
+        expect(output).to include('Impact: 60% performance improvement')
+      end
+    end
+
+    describe '#format_json' do
+      subject(:json_output) { ai_formatter.format_json }
+
+      it 'includes AI-specific fields in JSON output' do
+        data = JSON.parse(json_output)
+        agent_result = data['agent_results'].first
+
+        expect(agent_result).to include('recommendations')
+        expect(agent_result).to include('performance_impact')
+        expect(agent_result).to include('risk_level')
+        expect(agent_result).to include('analysis_type')
+
+        recommendations = agent_result['recommendations']
+        expect(recommendations).to be_an(Array)
+        expect(recommendations.first).to include('action' => 'replace_factory_strategy')
+        expect(recommendations.first).to include('impact' => '60% performance improvement')
+      end
+    end
+  end
 end

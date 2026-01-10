@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe SpecScout::Agents::IntentAgent do
+RSpec.describe SpecScout::Optimizers::RuleBased::IntentOptimiser do
   let(:runtime_ms) { 15 }
   let(:factories_data) { {} }
   let(:db_data) { {} }
@@ -22,8 +22,8 @@ RSpec.describe SpecScout::Agents::IntentAgent do
       end
 
       it 'returns unclear intent with low confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:intent_unclear)
         expect(result.confidence).to eq(:low)
@@ -46,8 +46,8 @@ RSpec.describe SpecScout::Agents::IntentAgent do
       end
 
       it 'identifies unit test behavior with high confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:unit_test_behavior)
         expect(result.confidence).to eq(:high)
@@ -76,8 +76,8 @@ RSpec.describe SpecScout::Agents::IntentAgent do
       end
 
       it 'identifies integration test behavior with high confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:integration_test_behavior)
         expect(result.confidence).to eq(:high)
@@ -103,8 +103,8 @@ RSpec.describe SpecScout::Agents::IntentAgent do
       end
 
       it 'identifies likely unit test behavior with medium confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:unit_test_behavior)
         expect(result.confidence).to eq(:medium)
@@ -127,8 +127,8 @@ RSpec.describe SpecScout::Agents::IntentAgent do
       end
 
       it 'identifies likely integration test behavior with medium confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:integration_test_behavior)
         expect(result.confidence).to eq(:medium)
@@ -151,8 +151,8 @@ RSpec.describe SpecScout::Agents::IntentAgent do
       end
 
       it 'returns unclear intent with low confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:intent_unclear)
         expect(result.confidence).to eq(:low)
@@ -185,8 +185,8 @@ RSpec.describe SpecScout::Agents::IntentAgent do
               events: {},
               metadata: {}
             )
-            agent = described_class.new(profile_data)
-            result = agent.evaluate
+            optimizer = described_class.new(profile_data)
+            result = optimizer.evaluate
 
             expect(result.metadata[:file_location_signal]).to eq(:unit_test_location)
           end
@@ -214,8 +214,8 @@ RSpec.describe SpecScout::Agents::IntentAgent do
               events: {},
               metadata: {}
             )
-            agent = described_class.new(profile_data)
-            result = agent.evaluate
+            optimizer = described_class.new(profile_data)
+            result = optimizer.evaluate
 
             expect(result.metadata[:file_location_signal]).to eq(:integration_test_location)
           end
@@ -238,8 +238,8 @@ RSpec.describe SpecScout::Agents::IntentAgent do
         end
 
         it 'identifies fast execution pattern' do
-          agent = described_class.new(profile_data)
-          result = agent.evaluate
+          optimizer = described_class.new(profile_data)
+          result = optimizer.evaluate
 
           expect(result.metadata[:runtime_behavior_signal]).to eq(:fast_execution)
         end
@@ -259,8 +259,8 @@ RSpec.describe SpecScout::Agents::IntentAgent do
         end
 
         it 'identifies moderate execution pattern' do
-          agent = described_class.new(profile_data)
-          result = agent.evaluate
+          optimizer = described_class.new(profile_data)
+          result = optimizer.evaluate
 
           expect(result.metadata[:runtime_behavior_signal]).to eq(:moderate_execution)
         end
@@ -280,8 +280,8 @@ RSpec.describe SpecScout::Agents::IntentAgent do
         end
 
         it 'identifies slow execution pattern' do
-          agent = described_class.new(profile_data)
-          result = agent.evaluate
+          optimizer = described_class.new(profile_data)
+          result = optimizer.evaluate
 
           expect(result.metadata[:runtime_behavior_signal]).to eq(:slow_execution)
         end
@@ -289,7 +289,7 @@ RSpec.describe SpecScout::Agents::IntentAgent do
     end
   end
 
-  describe '#agent_name' do
+  describe '#optimizer_name' do
     let(:profile_data) do
       SpecScout::ProfileData.new(
         example_location: 'spec/models/user_spec.rb:42',
@@ -303,8 +303,8 @@ RSpec.describe SpecScout::Agents::IntentAgent do
     end
 
     it 'returns :intent' do
-      agent = described_class.new(profile_data)
-      expect(agent.agent_name).to eq(:intent)
+      optimizer = described_class.new(profile_data)
+      expect(optimizer.optimizer_name).to eq(:intent)
     end
   end
 end

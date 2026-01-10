@@ -10,6 +10,7 @@ module SpecScout
     :confidence,      # Symbol: :high, :medium, :low
     :explanation,     # Array: Array of explanation strings
     :agent_results,   # Array: Array of AgentResult objects
+    :metadata,        # Hash: Additional metadata about the recommendation
     keyword_init: true
   ) do
     VALID_ACTIONS = %i[
@@ -30,6 +31,7 @@ module SpecScout
       self.confidence ||= :low
       self.explanation ||= []
       self.agent_results ||= []
+      self.metadata ||= {}
     end
 
     def valid?
@@ -40,7 +42,8 @@ module SpecScout
         %i[high medium low].include?(confidence) &&
         explanation.is_a?(Array) &&
         agent_results.is_a?(Array) &&
-        agent_results.all? { |result| result.is_a?(AgentResult) }
+        agent_results.all? { |result| result.is_a?(AgentResult) || result.is_a?(OptimizerResult) } &&
+        metadata.is_a?(Hash)
     end
 
     def actionable?

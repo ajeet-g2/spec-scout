@@ -115,7 +115,7 @@ RSpec.describe SpecScout::Configuration do
 
     it 'raises error for invalid agents' do
       config.enabled_agents = [:invalid]
-      expect { config.validate! }.to raise_error(ArgumentError, /Invalid agents/)
+      expect { config.validate! }.to raise_error(ArgumentError, /Unregistered agents/)
     end
 
     it 'raises error for invalid output format' do
@@ -133,7 +133,65 @@ RSpec.describe SpecScout::Configuration do
       expect(hash[:enable]).to be true
       expect(hash[:use_test_prof]).to be true
       expect(hash[:enabled_agents]).to eq(%i[database factory intent risk])
+      expect(hash[:available_agents]).to eq(%i[database factory intent risk])
       expect(hash[:output_format]).to eq(:console)
+    end
+  end
+
+  describe 'agent registry integration' do
+    let(:config) { described_class.new }
+    let(:mock_ai_agent_class) { double('MockAIAgent', is_a?: true) }
+    let(:mock_rule_agent_class) { Class.new(SpecScout::BaseOptimizer) }
+
+    describe '#register_ai_agent' do
+      it 'registers AI agent through configuration' do
+        config.register_ai_agent(:performance, mock_ai_agent_class)
+
+        expect(config.agent_registry.llm_optimizer_registered?(:performance)).to be true
+        expect(config.available_agents).to include(:performance)
+      end
+    end
+
+    describe '#register_rule_based_agent' do
+      it 'registers rule-based agent through configuration' do
+        config.register_rule_based_agent(:security, mock_rule_agent_class)
+
+        expect(config.agent_registry.rule_based_optimizer_registered?(:security)).to be true
+        expect(config.available_agents).to include(:security)
+      end
+    end
+
+    describe '#available_agents' do
+      it 'returns all registered agent types' do
+        config.register_ai_agent(:performance, mock_ai_agent_class)
+        config.register_rule_based_agent(:security, mock_rule_agent_class)
+
+        available = config.available_agents
+        expect(available).to include(:database, :factory, :intent, :risk, :performance, :security)
+      end
+    end
+
+    describe '#filtered_enabled_agents' do
+      it 'filters enabled agents through registry' do
+        config.register_ai_agent(:performance, mock_ai_agent_class)
+        config.enabled_agents = %i[database performance nonexistent]
+
+        filtered = config.filtered_enabled_agents
+        expect(filtered).to contain_exactly(:database, :performance)
+      end
+    end
+
+    describe '#enable_agent with custom agents' do
+      it 'allows enabling custom agents' do
+        config.register_ai_agent(:performance, mock_ai_agent_class)
+        config.enable_agent(:performance)
+
+        expect(config.agent_enabled?(:performance)).to be true
+      end
+
+      it 'raises error for unregistered agents' do
+        expect { config.enable_agent(:nonexistent) }.to raise_error(ArgumentError, /Unknown agent/)
+      end
     end
   end
 end

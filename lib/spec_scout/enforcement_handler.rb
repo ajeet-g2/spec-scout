@@ -28,13 +28,13 @@ module SpecScout
       return false unless enforcement_enabled?
       return false unless recommendation
 
-      recommendation.confidence == case @config.fail_on_high_confidence
-                                   when true
-                                     :high
-                                   else
-                                     # Default enforcement: fail on high confidence recommendations
-                                     :high
-                                   end
+      recommendation.confidence
+      case @config.fail_on_high_confidence
+      when true
+      else
+        # Default enforcement: fail on high confidence recommendations
+      end
+      :high
     end
 
     # Handle enforcement for a recommendation

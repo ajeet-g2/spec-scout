@@ -2,28 +2,28 @@
 
 require 'spec_helper'
 
-RSpec.describe SpecScout::AgentResult do
+RSpec.describe SpecScout::OptimizerResult do
   describe '#initialize' do
-    it 'creates a valid AgentResult with default values' do
+    it 'creates a valid OptimizerResult with default values' do
       result = described_class.new
 
-      expect(result.agent_name).to eq(:unknown)
+      expect(result.optimizer_name).to eq(:unknown)
       expect(result.verdict).to eq(:no_verdict)
       expect(result.confidence).to eq(:low)
       expect(result.reasoning).to eq('')
       expect(result.metadata).to eq({})
     end
 
-    it 'creates an AgentResult with provided values' do
+    it 'creates an OptimizerResult with provided values' do
       result = described_class.new(
-        agent_name: :database,
+        optimizer_name: :database,
         verdict: :db_unnecessary,
         confidence: :high,
         reasoning: 'No database operations detected',
         metadata: { query_count: 0 }
       )
 
-      expect(result.agent_name).to eq(:database)
+      expect(result.optimizer_name).to eq(:database)
       expect(result.verdict).to eq(:db_unnecessary)
       expect(result.confidence).to eq(:high)
       expect(result.reasoning).to eq('No database operations detected')
@@ -32,9 +32,9 @@ RSpec.describe SpecScout::AgentResult do
   end
 
   describe '#valid?' do
-    it 'returns true for valid AgentResult' do
+    it 'returns true for valid OptimizerResult' do
       result = described_class.new(
-        agent_name: :database,
+        optimizer_name: :database,
         verdict: :db_unnecessary,
         confidence: :high,
         reasoning: 'Test reasoning',

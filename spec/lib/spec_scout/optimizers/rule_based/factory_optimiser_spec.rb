@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe SpecScout::Agents::FactoryAgent do
+RSpec.describe SpecScout::Optimizers::RuleBased::FactoryOptimiser do
   let(:profile_data) do
     SpecScout::ProfileData.new(
       example_location: 'spec/models/user_spec.rb:42',
@@ -21,8 +21,8 @@ RSpec.describe SpecScout::Agents::FactoryAgent do
       let(:db_data) { {} }
 
       it 'returns optimal strategy with low confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:strategy_optimal)
         expect(result.confidence).to eq(:low)
@@ -36,8 +36,8 @@ RSpec.describe SpecScout::Agents::FactoryAgent do
       let(:db_data) { { inserts: 0, selects: 3, total_queries: 3 } }
 
       it 'recommends build_stubbed with medium confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:prefer_build_stubbed)
         expect(result.confidence).to eq(:medium)
@@ -52,8 +52,8 @@ RSpec.describe SpecScout::Agents::FactoryAgent do
       let(:db_data) { { inserts: 1, selects: 2, total_queries: 3 } }
 
       it 'indicates create is required with medium confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:create_required)
         expect(result.confidence).to eq(:medium)
@@ -66,8 +66,8 @@ RSpec.describe SpecScout::Agents::FactoryAgent do
       let(:db_data) { { inserts: 0, selects: 0, total_queries: 0 } }
 
       it 'indicates strategy is optimal with high confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:strategy_optimal)
         expect(result.confidence).to eq(:high)
@@ -89,8 +89,8 @@ RSpec.describe SpecScout::Agents::FactoryAgent do
       let(:db_data) { { inserts: 0, selects: 2, total_queries: 2 } }
 
       it 'indicates create is required due to associations with medium confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:create_required)
         expect(result.confidence).to eq(:medium)
@@ -112,8 +112,8 @@ RSpec.describe SpecScout::Agents::FactoryAgent do
       let(:db_data) { { inserts: 0, selects: 1, total_queries: 1 } }
 
       it 'detects association patterns and recommends create strategy' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:create_required)
         expect(result.confidence).to eq(:medium)
@@ -132,8 +132,8 @@ RSpec.describe SpecScout::Agents::FactoryAgent do
       let(:db_data) { { inserts: 1, selects: 1, total_queries: 2 } }
 
       it 'indicates create is required due to database writes with medium confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:create_required)
         expect(result.confidence).to eq(:medium)
@@ -142,13 +142,13 @@ RSpec.describe SpecScout::Agents::FactoryAgent do
     end
   end
 
-  describe '#agent_name' do
+  describe '#optimizer_name' do
     let(:factory_data) { {} }
     let(:db_data) { {} }
 
     it 'returns :factory' do
-      agent = described_class.new(profile_data)
-      expect(agent.agent_name).to eq(:factory)
+      optimizer = described_class.new(profile_data)
+      expect(optimizer.optimizer_name).to eq(:factory)
     end
   end
 end

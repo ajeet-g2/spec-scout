@@ -125,8 +125,8 @@ RSpec.describe SpecScout::SpecScout do
       )
 
       # Mock agent to fail
-      allow_any_instance_of(SpecScout::Agents::DatabaseAgent).to receive(:evaluate).and_raise(StandardError,
-                                                                                              'Agent failed')
+      allow_any_instance_of(SpecScout::Optimizers::RuleBased::DatabaseOptimiser).to receive(:evaluate).and_raise(StandardError,
+                                                                                                                 'Agent failed')
 
       result = spec_scout.analyze
 
@@ -165,7 +165,7 @@ RSpec.describe SpecScout::SpecScout do
       )
 
       # Mock agents to return results
-      allow_any_instance_of(SpecScout::Agents::DatabaseAgent).to receive(:evaluate).and_return(
+      allow_any_instance_of(SpecScout::Optimizers::RuleBased::DatabaseOptimiser).to receive(:evaluate).and_return(
         { verdict: :db_unnecessary, confidence: :high, reasoning: 'Test reasoning' }
       )
 

@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe SpecScout::Agents::DatabaseAgent do
+RSpec.describe SpecScout::Optimizers::RuleBased::DatabaseOptimiser do
   let(:profile_data) do
     SpecScout::ProfileData.new(
       example_location: 'spec/models/user_spec.rb:42',
@@ -20,8 +20,8 @@ RSpec.describe SpecScout::Agents::DatabaseAgent do
       let(:db_data) { {} }
 
       it 'returns unclear verdict with low confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:db_unclear)
         expect(result.confidence).to eq(:low)
@@ -34,8 +34,8 @@ RSpec.describe SpecScout::Agents::DatabaseAgent do
       let(:db_data) { { inserts: 0, selects: 1, total_queries: 1 } }
 
       it 'recommends avoiding database persistence with high confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:db_unnecessary)
         expect(result.confidence).to eq(:high)
@@ -49,8 +49,8 @@ RSpec.describe SpecScout::Agents::DatabaseAgent do
       let(:db_data) { { inserts: 0, selects: 5, total_queries: 5 } }
 
       it 'suggests database persistence may be unnecessary with medium confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:db_unnecessary)
         expect(result.confidence).to eq(:medium)
@@ -62,8 +62,8 @@ RSpec.describe SpecScout::Agents::DatabaseAgent do
       let(:db_data) { { inserts: 2, selects: 3, total_queries: 5 } }
 
       it 'indicates database persistence is required with high confidence' do
-        agent = described_class.new(profile_data)
-        result = agent.evaluate
+        optimizer = described_class.new(profile_data)
+        result = optimizer.evaluate
 
         expect(result.verdict).to eq(:db_required)
         expect(result.confidence).to eq(:high)
@@ -72,13 +72,13 @@ RSpec.describe SpecScout::Agents::DatabaseAgent do
     end
   end
 
-  describe '#agent_name' do
+  describe '#optimizer_name' do
     let(:db_data) { {} }
     let(:factory_data) { {} }
 
     it 'returns :database' do
-      agent = described_class.new(profile_data)
-      expect(agent.agent_name).to eq(:database)
+      optimizer = described_class.new(profile_data)
+      expect(optimizer.optimizer_name).to eq(:database)
     end
   end
 end
